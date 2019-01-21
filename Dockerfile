@@ -26,11 +26,23 @@ RUN yum -y groupinstall development
 RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
 RUN yum -y install python36u
 RUN yum -y install python36u-pip
-RUN pip3.6 install awscli --upgrade --user
+RUN pip3.6 install --proxy $proxy -U pip
+USER slave
+RUN pip3.6 install --proxy $proxy awscli --upgrade --user
 
 #Install Git
+USER root
 RUN yum -y install git
 
+#Git config
+USER slave
+RUN git config --global credential.helper '!aws codecommit credential-helper $@'
+RUN git config --global credential.UseHttpPath true
+RUN git config --global http.proxy $proxy
+RUN git config --global https.proxy $proxy
+ENV PATH=$PATH:$HOME/.local/bin/
+
+USER root
 ENTRYPOINT ["/usr/sbin/sshd", "-D"]
 
 
