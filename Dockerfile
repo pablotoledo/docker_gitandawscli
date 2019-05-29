@@ -42,6 +42,8 @@ RUN git config --global http.proxy $proxy
 RUN git config --global https.proxy $proxy
 ENV PATH=$PATH:$HOME/.local/bin/
 
+RUN sed -i "s|UsePAM yes|UsePAM no |g" /etc/ssh/sshd_config
+
 USER root
 ENTRYPOINT ["/usr/sbin/sshd", "-D"]
 
